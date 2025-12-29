@@ -84,3 +84,12 @@ class Protocol:
             b += data
             s += len(data)
         return b
+
+    @staticmethod
+    def broadcast(msg: bytes, clients: set):
+        data = Protocol.create_msg(msg)
+        for client in clients:
+            try:
+                client.send(data)
+            except:
+                ...
