@@ -4,8 +4,7 @@ import json
 
 class Protocol:
 
-
-    commands = []
+    KICK = b"KICK"
 
     @staticmethod
     def create_msg(data: bytes) -> bytes:
@@ -24,9 +23,6 @@ class Protocol:
         len_of_msg = Protocol.convert_to_base10(l, 256)
         return working_socket.recv(len_of_msg)
 
-    @staticmethod
-    def verify_command(cmd: bytes):
-        return cmd in Protocol.commands
 
     @staticmethod
     def convert_base(n, b):
@@ -46,25 +42,6 @@ class Protocol:
             s += n[p] * pow(b, p)
         return s
 
-    @staticmethod
-    def parse_command(cmd: bytes):
-        l = [b""]
-        i = 0
-        cmd_index = 0
-        opened_quotes = False
-        while len(cmd) > cmd_index:
-            if cmd[cmd_index].to_bytes(1, "little") == b" " and not opened_quotes:
-                i += 1
-                l.append(b"")
-                cmd_index += 1
-                continue
-            if cmd[cmd_index].to_bytes(1, "little") in [b"'", b'"']:
-                opened_quotes = not opened_quotes
-                cmd_index += 1
-                continue
-            l[i] += cmd[cmd_index].to_bytes(1, "little")
-            cmd_index+=1
-        return l
 
     @staticmethod
     def send_file(working_socket: socket.socket, file_path: str):

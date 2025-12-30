@@ -38,6 +38,9 @@ class Client:
             try:
                 if self.disconnect: return
                 msg = Protocol.get_msg(self.sock)
+                if msg == b"KICK":
+                    self.disconnect = True
+                    continue
                 GREEN = '\033[32m'
                 RESET = '\033[0m'
                 print(GREEN)

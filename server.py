@@ -95,20 +95,25 @@ class Server:
 
                 if cmd == 3:
                     if client_id not in self.managers: continue
+                    man = client_id
                     client_id = params["client_id"].encode()
                     if client_id not in self.clients_id.values(): continue
+
                     kicked_client = self.get_client_from_id(client_id)
+                    kicked_client.send(Protocol.create_msg(Protocol.KICK))
                     self.close(kicked_client)
+                    Protocol.broadcast(f"{client_id.decode()} got kicked by {man.decode()}".encode(), self.clients)
+
                 if cmd == 4:
                     if client_id not in self.managers: continue
-                    client_id = params["client_id"].encode()
-                    if client_id not in self.clients_id.values(): continue
-                    self.silenced.add(client_id)
+                    client_id_to_silence = params["client_id"].encode()
+                    if client_id_to_silence not in self.clients_id.values(): continue
+                    self.silenced.add(client_id_to_silence)
+                    Protocol.broadcast(f"{client_id_to_silence.decode()} got silenced by {client_id.decode()}".encode(), self.clients)
                 if cmd == 5:
                     if name in self.silenced:
                         client.send(Protocol.create_msg(b"You cannot speak here"))
                         continue
-
                     client_id = params["client_id"].encode()
                     client_socket: socket.socket = self.get_client_from_id(client_id)
                     name = self.clients_id[client]
